@@ -134,7 +134,7 @@ func Provider() *schema.Provider {
 				},
 				Description: "",
 			},
-			"bastion_host": {
+			"proxy_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "URL to the proxy to be used for all requests",
@@ -441,7 +441,7 @@ func initializeConfiguration(d *schema.ResourceData) (*restclient.Config, error)
 		overrides.AuthInfo.Exec = exec
 	}
 
-	if v, ok := d.GetOk("bastion_host"); ok {
+	if v, ok := d.GetOk("proxy_url"); ok {
 		overrides.ClusterDefaults.ProxyURL = v.(string)
 	}
 
