@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"context"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 
@@ -31,6 +32,12 @@ func resourceKubernetesSecret() *schema.Resource {
 				Optional:    true,
 				Sensitive:   true,
 			},
+			"from_env_file": {
+				Type:        schema.TypeString,
+				Description: "Path to a file to read lines of key=val pairs to create a secret.",
+				Optional:    true,
+				Sensitive:   true,
+			},
 			"type": {
 				Type:        schema.TypeString,
 				Description: "Type of secret",
@@ -49,9 +56,22 @@ func resourceKubernetesSecretCreate(ctx context.Context, d *schema.ResourceData,
 	}
 
 	metadata := expandMetadata(d.Get("metadata").([]interface{}))
+
+	fromEnvData := d.Get("from_env_file")
+	secretData := make(map[string]interface{})
+
+	if fromEnvData != nil {
+		for _, line := range strings.Split(fromEnvData.(string), "\n") {
+			lineSplitted := strings.Split(line, "=")
+			secretData[lineSplitted[0]] = lineSplitted[1]
+		}
+	} else {
+		secretData = d.Get("data").(map[string]interface{})
+	}
+
 	secret := api.Secret{
 		ObjectMeta: metadata,
-		Data:       expandStringMapToByteMap(d.Get("data").(map[string]interface{})),
+		Data:       expandStringMapToByteMap(secretData),
 	}
 
 	if v, ok := d.GetOk("type"); ok {
