@@ -134,6 +134,11 @@ func Provider() *schema.Provider {
 				},
 				Description: "",
 			},
+			"proxy_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "URL to the proxy to be used for all requests",
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -381,6 +386,10 @@ func initializeConfiguration(d *schema.ResourceData) (*restclient.Config, error)
 			return nil, fmt.Errorf("Failed to parse exec")
 		}
 		overrides.AuthInfo.Exec = exec
+	}
+
+	if v, ok := d.GetOk("proxy_url"); ok {
+		overrides.ClusterDefaults.ProxyURL = v.(string)
 	}
 
 	cc := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loader, overrides)
