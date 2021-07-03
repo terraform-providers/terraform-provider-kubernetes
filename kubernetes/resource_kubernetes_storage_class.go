@@ -31,6 +31,7 @@ func resourceKubernetesStorageClass() *schema.Resource {
 			"metadata": metadataSchema("storage class", true),
 			"parameters": {
 				Type:        schema.TypeMap,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "The parameters for the provisioner that should create volumes of this storage class",
 				Optional:    true,
 				ForceNew:    true,
@@ -185,6 +186,7 @@ func resourceKubernetesStorageClassRead(ctx context.Context, d *schema.ResourceD
 
 	sc := flattenStorageClass(*storageClass)
 	for k, v := range sc {
+		//lintignore:R001
 		err = d.Set(k, v)
 		if err != nil {
 			diags = append(diags, diag.FromErr(err)[0])

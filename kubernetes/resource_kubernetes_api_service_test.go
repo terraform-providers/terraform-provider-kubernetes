@@ -12,13 +12,12 @@ import (
 )
 
 func TestAccKubernetesAPIService_basic(t *testing.T) {
-	group := fmt.Sprintf("tf-acc-test-%s.k8s.io", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	group := fmt.Sprintf("tf-acc-test-%s.k8s.io", acctest.RandString(8))
 	version := "v1beta1"
 	name := fmt.Sprintf("%s.%s", version, group)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_api_service.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesAPIServiceDestroy,
 		Steps: []resource.TestStep{

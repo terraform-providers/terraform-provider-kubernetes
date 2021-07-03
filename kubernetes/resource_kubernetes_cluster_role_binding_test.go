@@ -14,11 +14,10 @@ import (
 
 func TestAccKubernetesClusterRoleBinding_basic(t *testing.T) {
 	var conf api.ClusterRoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_cluster_role_binding.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesClusterRoleBindingDestroy,
 		Steps: []resource.TestStep{
@@ -121,11 +120,10 @@ func TestAccKubernetesClusterRoleBinding_basic(t *testing.T) {
 
 func TestAccKubernetesClusterRoleBinding_serviceaccount_subject(t *testing.T) {
 	var conf api.ClusterRoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_cluster_role_binding.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesClusterRoleBindingDestroy,
 		Steps: []resource.TestStep{
@@ -153,11 +151,10 @@ func TestAccKubernetesClusterRoleBinding_serviceaccount_subject(t *testing.T) {
 
 func TestAccKubernetesClusterRoleBinding_group_subject(t *testing.T) {
 	var conf api.ClusterRoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 	resourceName := "kubernetes_cluster_role_binding.test"
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_cluster_role_binding.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesClusterRoleBindingDestroy,
 		Steps: []resource.TestStep{
@@ -190,11 +187,10 @@ func TestAccKubernetesClusterRoleBinding_group_subject(t *testing.T) {
 
 func TestAccKubernetesClusterRoleBinding_UpdatePatchOperationsOrderWithRemovals(t *testing.T) {
 	var conf api.ClusterRoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_cluster_role_binding.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesClusterRoleBindingDestroy,
 		Steps: []resource.TestStep{

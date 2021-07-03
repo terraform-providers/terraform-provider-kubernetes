@@ -14,12 +14,11 @@ import (
 
 func TestAccKubernetesCronJob_basic(t *testing.T) {
 	var conf1, conf2 v1beta1.CronJob
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	imageName := alpineImageVersion
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_cron_job.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesCronJobDestroy,
 		Steps: []resource.TestStep{
@@ -74,12 +73,11 @@ func TestAccKubernetesCronJob_basic(t *testing.T) {
 
 func TestAccKubernetesCronJob_extra(t *testing.T) {
 	var conf v1beta1.CronJob
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	imageName := alpineImageVersion
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_cron_job.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesCronJobDestroy,
 		Steps: []resource.TestStep{

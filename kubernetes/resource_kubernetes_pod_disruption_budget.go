@@ -2,9 +2,8 @@ package kubernetes
 
 import (
 	"context"
-	"log"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	api "k8s.io/api/policy/v1beta1"
@@ -49,14 +48,14 @@ func resourceKubernetesPodDisruptionBudget() *schema.Resource {
 							Description:  podDisruptionBudgetSpecMaxUnavailableDoc,
 							Optional:     true,
 							ForceNew:     true,
-							ValidateFunc: validateTypeStringNullableIntOrPercent,
+							ValidateFunc: validateNumberOrPercentageOfPods(),
 						},
 						"min_available": {
 							Type:         schema.TypeString,
 							Description:  podDisruptionBudgetSpecMinAvailableDoc,
 							Optional:     true,
 							ForceNew:     true,
-							ValidateFunc: validateTypeStringNullableIntOrPercent,
+							ValidateFunc: validateNumberOrPercentageOfPods(),
 						},
 						"selector": {
 							Type:        schema.TypeList,

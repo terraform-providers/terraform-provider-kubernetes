@@ -1,12 +1,27 @@
-name: "Pull Request Triage"
+name: Pull Request Triage
 
-on: [pull_request_target]
+on:
+  pull_request_target:
+    types:
+      - opened
+
+permissions:
+  actions: read
+  checks: read
+  contents: read
+  deployments: none
+  issues: none
+  packages: none
+  pull-requests: read
+  repository-projects: none
+  security-events: none
+  statuses: read
 
 jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@v3
+    - uses: actions/labeler@5682b7c5137476cceba78108d82b25ae7897cc7c
       with:
         configuration-path: .github/labeler-pull-request-triage.yml
         repo-token: "${{ secrets.GITHUB_TOKEN }}"

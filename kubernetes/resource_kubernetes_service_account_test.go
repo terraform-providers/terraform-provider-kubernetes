@@ -15,12 +15,11 @@ import (
 
 func TestAccKubernetesServiceAccount_basic(t *testing.T) {
 	var conf api.ServiceAccount
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	resourceName := "kubernetes_service_account.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     resourceName,
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesServiceAccountDestroy,
 		Steps: []resource.TestStep{
@@ -67,11 +66,10 @@ func TestAccKubernetesServiceAccount_basic(t *testing.T) {
 
 func TestAccKubernetesServiceAccount_automount(t *testing.T) {
 	var conf api.ServiceAccount
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_service_account.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesServiceAccountDestroy,
 		Steps: []resource.TestStep{
@@ -112,11 +110,10 @@ func TestAccKubernetesServiceAccount_automount(t *testing.T) {
 
 func TestAccKubernetesServiceAccount_update(t *testing.T) {
 	var conf api.ServiceAccount
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_service_account.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesServiceAccountDestroy,
 		Steps: []resource.TestStep{
@@ -211,7 +208,6 @@ func TestAccKubernetesServiceAccount_generatedName(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_service_account.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesServiceAccountDestroy,
 		Steps: []resource.TestStep{

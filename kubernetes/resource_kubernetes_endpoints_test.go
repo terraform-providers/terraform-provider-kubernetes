@@ -15,11 +15,10 @@ import (
 
 func TestAccKubernetesEndpoints_basic(t *testing.T) {
 	var conf api.Endpoints
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_endpoints.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesEndpointDestroy,
 		Steps: []resource.TestStep{
@@ -110,7 +109,6 @@ func TestAccKubernetesEndpoints_generatedName(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_endpoints.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesEndpointDestroy,
 		Steps: []resource.TestStep{

@@ -592,10 +592,10 @@ func TestAccKubernetesPod_with_cfg_map_volume_mount(t *testing.T) {
 func TestAccKubernetesPod_with_projected_volume(t *testing.T) {
 	var conf api.Pod
 
-	cfgMapName := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
-	cfgMap2Name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
-	secretName := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
-	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	cfgMapName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
+	cfgMap2Name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
+	secretName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
+	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	imageName := busyboxImageVersion
 	resourceName := "kubernetes_pod.test"
 
@@ -758,14 +758,26 @@ func TestAccKubernetesPod_with_secret_vol_items(t *testing.T) {
 		CheckDestroy:      testAccCheckKubernetesPodDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccKubernetesPodConfigWithSecretItemsVolume(secretName, podName, imageName),
+				Config: testAccKubernetesPodConfigWithSecretItemsVolume(secretName, podName, imageName, "path/to/one.txt"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccCheckKubernetesPodExists(resourceName, &conf),
 					resource.TestCheckResourceAttr(resourceName, "spec.0.container.0.image", imageName),
 					resource.TestCheckResourceAttr(resourceName, "spec.0.volume.0.secret.0.items.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "spec.0.volume.0.secret.0.items.0.key", "one"),
-					resource.TestCheckResourceAttr(resourceName, "spec.0.volume.0.secret.0.items.0.path", "path/to/one"),
+					resource.TestCheckResourceAttr(resourceName, "spec.0.volume.0.secret.0.items.0.path", "path/to/one.txt"),
 				),
+			},
+			{ // Test path validation
+				ExpectError: regexp.MustCompile("May not be an absolute path. May not contain the path element '..'"),
+				Config:      testAccKubernetesPodConfigWithSecretItemsVolume(secretName, podName, imageName, ".."),
+			},
+			{
+				ExpectError: regexp.MustCompile("May not be an absolute path. May not contain the path element '..'"),
+				Config:      testAccKubernetesPodConfigWithSecretItemsVolume(secretName, podName, imageName, "../testpath"),
+			},
+			{
+				ExpectError: regexp.MustCompile("May not be an absolute path. May not contain the path element '..'"),
+				Config:      testAccKubernetesPodConfigWithSecretItemsVolume(secretName, podName, imageName, "/absolute/path/not/allowed"),
 			},
 			{
 				ResourceName:            resourceName,
@@ -918,7 +930,7 @@ func TestAccKubernetesPod_config_container_startup_probe(t *testing.T) {
 func TestAccKubernetesPod_termination_message_policy_default(t *testing.T) {
 	var confPod api.Pod
 
-	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	imageName := nginxImageVersion
 	resourceName := "kubernetes_pod.test"
 
@@ -949,7 +961,7 @@ func TestAccKubernetesPod_termination_message_policy_default(t *testing.T) {
 func TestAccKubernetesPod_termination_message_policy_override_as_file(t *testing.T) {
 	var confPod api.Pod
 
-	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	imageName := nginxImageVersion
 	resourceName := "kubernetes_pod.test"
 
@@ -980,7 +992,7 @@ func TestAccKubernetesPod_termination_message_policy_override_as_file(t *testing
 func TestAccKubernetesPod_termination_message_policy_override_as_fallback_to_logs_on_err(t *testing.T) {
 	var confPod api.Pod
 
-	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	podName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	imageName := nginxImageVersion
 	resourceName := "kubernetes_pod.test"
 
@@ -1718,7 +1730,7 @@ resource "kubernetes_pod" "test" {
 `, secretName, podName, imageName)
 }
 
-func testAccKubernetesPodConfigWithSecretItemsVolume(secretName, podName, imageName string) string {
+func testAccKubernetesPodConfigWithSecretItemsVolume(secretName, podName, imageName, path string) string {
 	return fmt.Sprintf(`resource "kubernetes_secret" "test" {
   metadata {
     name = "%s"
@@ -1759,13 +1771,13 @@ resource "kubernetes_pod" "test" {
 
         items {
           key  = "one"
-          path = "path/to/one"
+          path = "%s"
         }
       }
     }
   }
 }
-`, secretName, podName, imageName)
+`, secretName, podName, imageName, path)
 }
 
 func testAccKubernetesPodConfigWithConfigMapVolume(secretName, podName, imageName string) string {

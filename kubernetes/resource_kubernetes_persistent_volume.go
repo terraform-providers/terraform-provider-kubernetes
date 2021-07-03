@@ -97,9 +97,9 @@ func resourceKubernetesPersistentVolume() *schema.Resource {
 						},
 						"capacity": {
 							Type:             schema.TypeMap,
+							Elem:             &schema.Schema{Type: schema.TypeString},
 							Description:      "A description of the persistent volume's resources and capacity. More info: http://kubernetes.io/docs/user-guide/persistent-volumes#capacity",
 							Required:         true,
-							Elem:             schema.TypeString,
 							ValidateFunc:     validateResourceList,
 							DiffSuppressFunc: suppressEquivalentResourceQuantity,
 						},
@@ -125,14 +125,12 @@ func resourceKubernetesPersistentVolume() *schema.Resource {
 									"namespace": {
 										Type:        schema.TypeString,
 										Description: "The namespace of the PersistentVolumeClaim. Uses 'default' namespace if none is specified.",
-										Elem:        schema.TypeString,
 										Optional:    true,
 										Default:     "default",
 									},
 									"name": {
 										Type:        schema.TypeString,
 										Description: "The name of the PersistentVolumeClaim",
-										Elem:        schema.TypeString,
 										Required:    true,
 									},
 								},

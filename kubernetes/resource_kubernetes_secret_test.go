@@ -16,12 +16,11 @@ import (
 
 func TestAccKubernetesSecret_basic(t *testing.T) {
 	var conf api.Secret
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	resourceName := "kubernetes_secret.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     resourceName,
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesSecretDestroy,
 		Steps: []resource.TestStep{
@@ -139,7 +138,7 @@ func TestAccKubernetesSecret_basic(t *testing.T) {
 	})
 }
 
-func TestAccKuberNetesSecret_dotInName(t *testing.T) {
+func TestAccKubernetesSecret_dotInName(t *testing.T) {
 	var conf api.Secret
 
 	resource.Test(t, resource.TestCase{
@@ -165,7 +164,6 @@ func TestAccKubernetesSecret_generatedName(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     resourceName,
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesSecretDestroy,
 		Steps: []resource.TestStep{
@@ -200,7 +198,6 @@ func TestAccKubernetesSecret_binaryData(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_secret.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesSecretDestroy,
 		Steps: []resource.TestStep{

@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	api "k8s.io/api/core/v1"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -24,7 +25,7 @@ func podSpecFields(isUpdatable, isComputed bool) map[string]*schema.Schema {
 			Optional:     true,
 			Computed:     isComputed,
 			ForceNew:     false, // always updatable
-			ValidateFunc: validatePositiveInteger,
+			ValidateFunc: validation.IntAtLeast(1),
 			Description:  "Optional duration in seconds the pod may be active on the node relative to StartTime before the system will actively try to mark it failed and kill associated containers. Value must be a positive integer.",
 		},
 		"automount_service_account_token": {
@@ -223,6 +224,7 @@ func podSpecFields(isUpdatable, isComputed bool) map[string]*schema.Schema {
 		},
 		"node_selector": {
 			Type:        schema.TypeMap,
+			Elem:        &schema.Schema{Type: schema.TypeString},
 			Optional:    true,
 			Computed:    isComputed,
 			ForceNew:    !isUpdatable,
@@ -352,7 +354,7 @@ func podSpecFields(isUpdatable, isComputed bool) map[string]*schema.Schema {
 			Computed:     isComputed,
 			ForceNew:     !isUpdatable,
 			Default:      conditionalDefault(!isComputed, 30),
-			ValidateFunc: validateTerminationGracePeriodSeconds,
+			ValidateFunc: validation.IntAtLeast(0),
 			Description:  "Optional duration in seconds the pod needs to terminate gracefully. May be decreased in delete request. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period will be used instead. The grace period is the duration in seconds after the processes running in the pod are sent a termination signal and the time when the processes are forcibly halted with a kill signal. Set this value longer than the expected cleanup time for your process.",
 		},
 		"toleration": {
@@ -486,7 +488,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 							"path": {
 								Type:         schema.TypeString,
 								Optional:     true,
-								ValidateFunc: validateAttributeValueDoesNotContain(".."),
+								ValidateFunc: validateRelativePath(),
 								Description:  `The relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'.`,
 							},
 						},
@@ -524,7 +526,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 					Type:         schema.TypeString,
 					Description:  "Target directory name. Must not contain or start with '..'. If '.' is supplied, the volume directory will be the git repository. Otherwise, if specified, the volume will contain the git repository in the subdirectory with the given name.",
 					Optional:     true,
-					ValidateFunc: validateAttributeValueDoesNotContain(".."),
+					ValidateFunc: validation.StringDoesNotMatch(regexp.MustCompile("\\.\\."), "may not contain '..'"),
 				},
 				"repository": {
 					Type:        schema.TypeString,
@@ -589,7 +591,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 							"path": {
 								Type:         schema.TypeString,
 								Required:     true,
-								ValidateFunc: validateAttributeValueDoesNotContain(".."),
+								ValidateFunc: validateRelativePath(),
 								Description:  `Path is the relative path name of the file to be created. Must not be absolute or contain the '..' path. Must be utf-8 encoded. The first item of the relative path must not start with '..'`,
 							},
 							"resource_field_ref": {
@@ -638,7 +640,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 					Optional:     true,
 					Default:      "",
 					ForceNew:     !isUpdatable,
-					ValidateFunc: validateAttributeValueIsIn([]string{"", "Memory"}),
+					ValidateFunc: validation.StringInSlice([]string{"", "Memory"}, false),
 				},
 				"size_limit": {
 					Type:             schema.TypeString,
@@ -708,7 +710,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 							"path": {
 								Type:         schema.TypeString,
 								Optional:     true,
-								ValidateFunc: validateAttributeValueDoesNotContain(".."),
+								ValidateFunc: validateRelativePath(),
 								Description:  "The relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'.",
 							},
 						},
@@ -785,7 +787,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 													"path": {
 														Type:         schema.TypeString,
 														Optional:     true,
-														ValidateFunc: validateAttributeValueDoesNotContain(".."),
+														ValidateFunc: validateRelativePath(),
 														Description:  "The relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'.",
 													},
 												},
@@ -831,7 +833,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 													"path": {
 														Type:         schema.TypeString,
 														Optional:     true,
-														ValidateFunc: validateAttributeValueDoesNotContain(".."),
+														ValidateFunc: validateRelativePath(),
 														Description:  "The relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'.",
 													},
 												},
@@ -889,7 +891,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 													"path": {
 														Type:         schema.TypeString,
 														Required:     true,
-														ValidateFunc: validateAttributeValueDoesNotContain(".."),
+														ValidateFunc: validateRelativePath(),
 														Description:  "Path is the relative path name of the file to be created. Must not be absolute or contain the '..' path. Must be utf-8 encoded. The first item of the relative path must not start with '..'",
 													},
 													"resource_field_ref": {
@@ -941,7 +943,7 @@ func volumeSchema(isUpdatable bool) *schema.Resource {
 											Optional:     true,
 											Default:      3600,
 											Description:  "ExpirationSeconds is the expected duration of validity of the service account token. It defaults to 1 hour and must be at least 10 minutes (600 seconds).",
-											ValidateFunc: validateIntGreaterThan(600),
+											ValidateFunc: validation.IntAtLeast(600),
 										},
 										"path": {
 											Type:        schema.TypeString,

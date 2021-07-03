@@ -3,10 +3,12 @@ package kubernetes
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"regexp"
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apiValidation "k8s.io/apimachinery/pkg/api/validation"
 	utilValidation "k8s.io/apimachinery/pkg/util/validation"
@@ -165,60 +167,6 @@ func validateResourceQuantity(value interface{}, key string) (ws []string, es []
 	return
 }
 
-func validateNonNegativeInteger(value interface{}, key string) (ws []string, es []error) {
-	v := value.(int)
-	if v < 0 {
-		es = append(es, fmt.Errorf("%s must be greater than or equal to 0", key))
-	}
-	return
-}
-
-func validatePositiveInteger(value interface{}, key string) (ws []string, es []error) {
-	v := value.(int)
-	if v <= 0 {
-		es = append(es, fmt.Errorf("%s must be greater than 0", key))
-	}
-	return
-}
-
-func validateTerminationGracePeriodSeconds(value interface{}, key string) (ws []string, es []error) {
-	v := value.(int)
-	if v < 0 {
-		es = append(es, fmt.Errorf("%s must be greater than or equal to 0", key))
-	}
-	return
-}
-
-func validateIntGreaterThan(minValue int) func(value interface{}, key string) (ws []string, es []error) {
-	return func(value interface{}, key string) (ws []string, es []error) {
-		v := value.(int)
-		if v < minValue {
-			es = append(es, fmt.Errorf("%s must be greater than or equal to %d", key, minValue))
-		}
-		return
-	}
-}
-
-// validateTypeStringNullableInt provides custom error messaging for TypeString ints
-// Some arguments require an int value or unspecified, empty field.
-func validateTypeStringNullableInt(v interface{}, k string) (ws []string, es []error) {
-	value, ok := v.(string)
-	if !ok {
-		es = append(es, fmt.Errorf("expected type of %s to be string", k))
-		return
-	}
-
-	if value == "" {
-		return
-	}
-
-	if _, err := strconv.ParseInt(value, 10, 64); err != nil {
-		es = append(es, fmt.Errorf("%s: cannot parse '%s' as int: %s", k, value, err))
-	}
-
-	return
-}
-
 func validateModeBits(value interface{}, key string) (ws []string, es []error) {
 	if !strings.HasPrefix(value.(string), "0") {
 		es = append(es, fmt.Errorf("%s: value %s should start with '0' (octal numeral)", key, value.(string)))
@@ -233,42 +181,23 @@ func validateModeBits(value interface{}, key string) (ws []string, es []error) {
 	return
 }
 
-func validateAttributeValueDoesNotContain(searchString string) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		input := v.(string)
-		if strings.Contains(input, searchString) {
-			errors = append(errors, fmt.Errorf(
-				"%q must not contain %q",
-				k, searchString))
-		}
-		return
-	}
+func validateNumberOrPercentageOfPods() schema.SchemaValidateFunc {
+	return validation.StringMatch(regexp.MustCompile(`^([0-9]+|[0-9]+%|)$`), "Must be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).")
 }
 
-func validateAttributeValueIsIn(validValues []string) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		input := v.(string)
-		isValid := false
-		for _, s := range validValues {
-			if s == input {
-				isValid = true
-				break
-			}
-		}
-		if !isValid {
-			errors = append(errors, fmt.Errorf(
-				"%q must contain a value from %#v, got %q",
-				k, validValues, input))
-		}
-		return
-
-	}
+func validateRelativePath() schema.SchemaValidateFunc {
+	return validation.StringDoesNotMatch(regexp.MustCompile("^/|\\.\\."), "May not be an absolute path. May not contain the path element '..'")
 }
 
-func validateTypeStringNullableIntOrPercent(v interface{}, key string) (ws []string, es []error) {
+// validateTypeStringNullableInt provides custom error messaging for TypeString ints
+// Some arguments require an int value or unspecified, empty field.
+// TODO: FIXME: make this an int and use a pointer to differentiate between 0 and unset.
+
+//lintignore:V013
+func validateTypeStringNullableInt(v interface{}, k string) (ws []string, es []error) {
 	value, ok := v.(string)
 	if !ok {
-		es = append(es, fmt.Errorf("expected type of %s to be string", key))
+		es = append(es, fmt.Errorf("expected type of %s to be string", k))
 		return
 	}
 
@@ -276,16 +205,8 @@ func validateTypeStringNullableIntOrPercent(v interface{}, key string) (ws []str
 		return
 	}
 
-	if strings.HasSuffix(value, "%") {
-		percent, err := strconv.ParseInt(strings.TrimSuffix(value, "%"), 10, 32)
-		if err != nil {
-			es = append(es, fmt.Errorf("%s: cannot parse '%s' as percent: %s", key, value, err))
-		}
-		if percent < 0 || percent > 100 {
-			es = append(es, fmt.Errorf("%s: '%s' is not between 0%% and 100%%", key, value))
-		}
-	} else if _, err := strconv.ParseInt(value, 10, 32); err != nil {
-		es = append(es, fmt.Errorf("%s: cannot parse '%s' as int or percent: %s", key, value, err))
+	if _, err := strconv.ParseInt(value, 10, 64); err != nil {
+		es = append(es, fmt.Errorf("%s: cannot parse '%s' as int: %s", k, value, err))
 	}
 
 	return

@@ -13,12 +13,11 @@ import (
 )
 
 func TestAccKubernetesCertificateSigningRequest_basic(t *testing.T) {
-	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	usages := []string{"client auth"}
 	signerName := "kubernetes.io/legacy-unknown"
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_certificate_signing_request.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesCertificateSigningRequestDestroy,
 		Steps: []resource.TestStep{
@@ -31,10 +30,9 @@ func TestAccKubernetesCertificateSigningRequest_basic(t *testing.T) {
 }
 
 func TestAccKubernetesCertificateSigningRequest_generateName(t *testing.T) {
-	generateName := fmt.Sprintf("tf-acc-test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	generateName := fmt.Sprintf("tf-acc-test-%s", acctest.RandString(8))
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_certificate_signing_request.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesCertificateSigningRequestDestroy,
 		Steps: []resource.TestStep{

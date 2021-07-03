@@ -14,12 +14,11 @@ import (
 
 func TestAccKubernetesRoleBinding_basic(t *testing.T) {
 	var conf api.RoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 	resourceName := "kubernetes_role_binding.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     resourceName,
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesRoleBindingDestroy,
 		Steps: []resource.TestStep{
@@ -127,11 +126,10 @@ func TestAccKubernetesRoleBinding_basic(t *testing.T) {
 
 func TestAccKubernetesRoleBinding_sa_subject(t *testing.T) {
 	var conf api.RoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_role_binding.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesRoleBindingDestroy,
 		Steps: []resource.TestStep{
@@ -159,11 +157,10 @@ func TestAccKubernetesRoleBinding_sa_subject(t *testing.T) {
 
 func TestAccKubernetesRoleBinding_group_subject(t *testing.T) {
 	var conf api.RoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_role_binding.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesRoleBindingDestroy,
 		Steps: []resource.TestStep{
@@ -191,11 +188,10 @@ func TestAccKubernetesRoleBinding_group_subject(t *testing.T) {
 
 func TestAccKubernetesRoleBinding_Bug(t *testing.T) {
 	var conf api.RoleBinding
-	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	name := fmt.Sprintf("tf-acc-test:%s", acctest.RandString(8))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
-		IDRefreshName:     "kubernetes_role_binding.test",
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testAccCheckKubernetesRoleBindingDestroy,
 		Steps: []resource.TestStep{
